@@ -6,11 +6,11 @@
 
 
 # Set this to point to your compiled checkout of caffe
-caffevis_caffe_root      = '/usr/local/caffe/'
+caffevis_caffe_root      = '/root/caffe/'
 
 # Load model: caffenet-yos
 # Path to caffe deploy prototxt file. Minibatch size should be 1.
-PATH = '/Users/johmathe/code/enmi/rhd'
+PATH = '/home/johmathe/code/enmi/rhd'
 caffevis_deploy_prototxt = PATH + '/rhd_classifier_deploy.prototxt'
 
 # Path to network weights to load.
@@ -28,7 +28,7 @@ def caffevis_layer_pretty_name_fn(name):
     return name.replace('pool','p').replace('norm','n')
 
 # Use GPU? Default is True.
-caffevis_mode_gpu = False
+caffevis_mode_gpu = True
 # Display tweaks.
 # Scale all window panes in UI by this factor
 #global_scale = 1.0
