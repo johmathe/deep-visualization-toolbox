@@ -41,7 +41,7 @@ def get_parser():
                         help = 'Random seed used for generating the start-at image (use different seeds to generate different images).')
 
     # What to optimize
-    parser.add_argument('--push-layer', type = str, default = 'fc8',
+    parser.add_argument('--push-layer', type = str, default = 'fc8_rhd',
                         help = 'Name of layer that contains the desired neuron whose value is optimized.')
     parser.add_argument('--push-channel', type = int, default = '130',
                         help = 'Channel number for desired neuron whose value is optimized (channel for conv, neuron index for FC).')
@@ -133,7 +133,7 @@ def parse_and_validate_push_spatial(parser, push_spatial):
 def main():
     parser = get_parser()
     args = parser.parse_args()
-    
+
     # Finish parsing args
     channel_swap_to_rgb = eval(args.channel_swap_to_rgb)
     assert isinstance(channel_swap_to_rgb, tuple) and len(channel_swap_to_rgb) > 0, 'channel_swap_to_rgb should be a tuple'
@@ -143,7 +143,7 @@ def main():
 
     lr_params = parse_and_validate_lr_params(parser, args.lr_policy, args.lr_params)
     push_spatial = parse_and_validate_push_spatial(parser, args.push_spatial)
-    
+
     # Load mean
     data_mean = eval(args.mean)
 
@@ -173,7 +173,7 @@ def main():
             data_mean = np.expand_dims(data_mean, -1)
 
     print 'Using mean:', repr(data_mean)
-            
+
     # Load network
     sys.path.insert(0, os.path.join(args.caffe_root, 'python'))
     import caffe
@@ -192,7 +192,7 @@ def main():
     optimizer = GradientOptimizer(net, data_mean, labels = labels,
                                   label_layers = settings.caffevis_label_layers,
                                   channel_swap_to_rgb = channel_swap_to_rgb)
-    
+
     params = FindParams(
         start_at = args.start_at,
         rand_seed = args.rand_seed,

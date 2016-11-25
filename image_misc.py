@@ -51,7 +51,7 @@ def cv2_read_cap_rgb(cap, saveto = None):
     frame = frame[:,:,::-1]   # Convert native OpenCV BGR -> RGB
     return frame
 
-    
+
 def cv2_read_file_rgb(filename):
     '''Reads an image from file. Always returns (x,y,3)'''
     im = cv2.imread(filename)
@@ -66,11 +66,11 @@ def cv2_read_file_rgb(filename):
     im = im[:,:,::-1]   # Convert native OpenCV BGR -> RGB
     return im
 
-    
+
 def read_cam_frame(cap, saveto = None):
     #frame = np.array(cv2_read_cap_rgb(cap, saveto = saveto), dtype='float32')
     frame = cv2_read_cap_rgb(cap, saveto = saveto)
-    frame = frame[:,::-1,:]  # flip L-R for display
+    #frame = frame[:,::-1,:]  # flip L-R for display
     frame -= frame.min()
     frame = frame * (255.0 / (frame.max() + 1e-6))
     return frame
@@ -97,7 +97,7 @@ def cv2_imshow_rgb(window_name, img):
 def caffe_load_image(filename, color=True, as_uint=False):
     '''
     Copied from Caffe to simplify potential import problems.
-    
+
     Load an image converting from grayscale or alpha as needed.
 
     Take
@@ -135,13 +135,13 @@ def get_tiles_height_width(n_tiles, desired_width = None):
         width = desired_width
         height = int(np.ceil(float(n_tiles) / width))
     return height,width
-        
+
 
 def get_tiles_height_width_ratio(n_tiles, width_ratio = 1.0):
     '''Get a height x width size that will fit n_tiles tiles.'''
     width = int(np.ceil(np.sqrt(n_tiles * width_ratio)))
     return get_tiles_height_width(n_tiles, desired_width = width)
-        
+
 
 def tile_images_normalize(data, c01 = False, boost_indiv = 0.0,  boost_gamma = 1.0, single_tile = False, scale_range = 1.0, neg_pos_colors = None):
     data = data.copy()
@@ -159,7 +159,7 @@ def tile_images_normalize(data, c01 = False, boost_indiv = 0.0,  boost_gamma = 1
         pos_clr = np.array(pos_clr).reshape((1,3))
         # Keep 0 at 0
         data /= max(data.max(), -data.min()) + 1e-10     # Map data to [-1, 1]
-        
+
         #data += .5 * scale_range  # now in [0, scale_range]
         #assert data.min() >= 0
         #assert data.max() <= scale_range
@@ -209,7 +209,7 @@ def tile_images_make_tiles(data, padsize=1, padval=0, hw=None, highlights = None
     ##data = np.pad(data, padding, mode=jy_pad_fn)
     #data = np.pad(data, padding, mode=padder.pad_function)
     #print 'padder.calls =', padder.calls
-    
+
     # Third iteration: two-way padding with highlights
     if highlights is not None:
         assert len(highlights) == data.shape[0]
@@ -231,7 +231,7 @@ def tile_images_make_tiles(data, padsize=1, padval=0, hw=None, highlights = None
             if padding[0][1] > 0:
                 data[-padding[0][1]:, :, :, cc] = padval[cc]
             data[:, :padding[1][0],  :, cc] = padval[cc]
-            if padding[1][1] > 0:    
+            if padding[1][1] > 0:
                 data[:, -padding[1][1]:, :, cc] = padval[cc]
             data[:, :, :padding[2][0],  cc] = padval[cc]
             if padding[2][1] > 0:
@@ -251,7 +251,7 @@ def tile_images_make_tiles(data, padsize=1, padval=0, hw=None, highlights = None
     data = data.reshape((height, width) + data.shape[1:]).transpose((0, 2, 1, 3) + tuple(range(4, data.ndim + 1)))
     data = data.reshape((height * data.shape[1], width * data.shape[3]) + data.shape[4:])
     data = data[0:-padsize, 0:-padsize]  # remove excess padding
-    
+
     return (height,width), data
 
 
@@ -371,7 +371,7 @@ class FormattedString(object):
         self.thick = thick if thick else defaults['thick']
         self.width = width # if None: calculate width automatically
         self.align = align if align else defaults.get('align', 'left')
-        
+
 
 def cv2_typeset_text(data, lines, loc, between = ' ', string_spacing = 0, line_spacing = 0, wrap = False):
     '''Typesets mutliple strings on multiple lines of text, where each string may have its own formatting.
@@ -402,7 +402,7 @@ def cv2_typeset_text(data, lines, loc, between = ' ', string_spacing = 0, line_s
     if not isinstance(lines[0], list):
         # If a single line of text is given as a list of strings, convert to multiline format
         lines = [lines]
-    
+
     locy = loc[1]
 
     line_num = 0
@@ -434,7 +434,7 @@ def cv2_typeset_text(data, lines, loc, between = ' ', string_spacing = 0, line_s
                 lines.insert(line_num+1, new_next_line)
                 break
                 ###line_num += 1
-                ###continue    
+                ###continue
             cv2.putText(data, fs.string, (locx,locy), fs.face, fs.fsize, fs.clr, fs.thick)
             maxy = max(maxy, boxsize[1])
             if fs.width is not None:
@@ -449,7 +449,7 @@ def cv2_typeset_text(data, lines, loc, between = ' ', string_spacing = 0, line_s
             locx += string_spacing
         line_num += 1
         locy += maxy + line_spacing
-        
+
     return locy
 
 

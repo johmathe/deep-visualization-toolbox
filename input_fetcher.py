@@ -7,11 +7,11 @@ from threading import RLock
 from codependent_thread import CodependentThread
 from image_misc import cv2_imshow_rgb, cv2_read_file_rgb, read_cam_frame, crop_to_square
 
-
+FILE = '/Users/johmathe/code/enmi/rhd/rhd_neg_2.mp4'
 
 class InputImageFetcher(CodependentThread):
     '''Fetches images from a webcam or loads from a directory.'''
-    
+
     def __init__(self, settings):
         CodependentThread.__init__(self, settings.input_updater_heartbeat_required)
         self.daemon = True
@@ -23,7 +23,7 @@ class InputImageFetcher(CodependentThread):
         self.static_file_mode = True
         self.settings = settings
         self.static_file_stretch_mode = self.settings.static_file_stretch_mode
-        
+
         # Cam input
         self.capture_device = settings.input_updater_capture_device
         self.no_cam_present = (self.capture_device is None)     # Disable all cam functionality
@@ -37,14 +37,14 @@ class InputImageFetcher(CodependentThread):
         self.latest_static_frame = None
         self.static_file_idx = None
         self.static_file_idx_increment = 0
-        
+
     def bind_camera(self):
         # Due to OpenCV limitations, this should be called from the main thread
         print 'InputImageFetcher: bind_camera starting'
         if self.no_cam_present:
             print 'InputImageFetcher: skipping camera bind (device: None)'
         else:
-            self.bound_cap_device = cv2.VideoCapture(self.capture_device)
+            self.bound_cap_device = cv2.VideoCapture(FILE)
             if self.bound_cap_device.isOpened():
                 print 'InputImageFetcher: capture device %s is open' % self.capture_device
             else:
@@ -66,7 +66,7 @@ class InputImageFetcher(CodependentThread):
     def set_mode_static(self):
         with self.lock:
             self.static_file_mode = True
-        
+
     def set_mode_cam(self):
         with self.lock:
             if self.no_cam_present:
@@ -74,35 +74,35 @@ class InputImageFetcher(CodependentThread):
             else:
                 self.static_file_mode = False
                 assert self.bound_cap_device != None, 'Call bind_camera first'
-        
+
     def toggle_input_mode(self):
         with self.lock:
             if self.static_file_mode:
                 self.set_mode_cam()
             else:
                 self.set_mode_static()
-        
+
     def set_mode_stretch_on(self):
         with self.lock:
             if not self.static_file_stretch_mode:
                 self.static_file_stretch_mode = True
                 self.latest_static_frame = None   # Force reload
                 #self.latest_frame_is_from_cam = True  # Force reload
-        
+
     def set_mode_stretch_off(self):
         with self.lock:
             if self.static_file_stretch_mode:
                 self.static_file_stretch_mode = False
                 self.latest_static_frame = None   # Force reload
                 #self.latest_frame_is_from_cam = True  # Force reload
-        
+
     def toggle_stretch_mode(self):
         with self.lock:
             if self.static_file_stretch_mode:
                 self.set_mode_stretch_off()
             else:
                 self.set_mode_stretch_on()
-        
+
     def run(self):
         while not self.quit and not self.is_timed_out():
             #start_time = time.time()
@@ -120,7 +120,7 @@ class InputImageFetcher(CodependentThread):
                     with self.lock:
                         self.latest_cam_frame = frame
                         self._increment_and_set_frame(self.latest_cam_frame, True)
-            
+
             time.sleep(self.sleep_after_read_frame)
             #print 'Reading one frame took', time.time() - start_time
 
